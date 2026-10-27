@@ -250,6 +250,8 @@ function render_home(): void
 <title>DMusicPlayer — Trang chủ</title>
 <link rel="manifest" href="DMusicPlayer.php?manifest=1">
 <meta name="theme-color" content="#16151c">
+<link rel="apple-touch-icon" href="DMusicPlayer.php?icon=180">
+<link rel="icon" type="image/png" sizes="192x192" href="DMusicPlayer.php?icon=192">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -320,6 +322,39 @@ function render_home(): void
     .empty{ color:var(--text-muted); font-size:13.5px; line-height:1.6; padding:18px 6px; text-align:center; }
     .empty code{ color:var(--amber); }
 
+    .lead-link{ color:var(--amber); text-decoration:none; white-space:nowrap; }
+    .lead-link:hover{ text-decoration:underline; }
+
+    .guide{ margin-top:22px; scroll-margin-top:16px; }
+    .guide-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .guide-head h2{ font-family:'Oswald',sans-serif; font-weight:600; text-transform:uppercase; font-size:20px; margin:0; }
+    .guide-head .ghost{ margin-left:auto; }
+    .guide details{ background:var(--surface); border:1px solid var(--line); border-radius:14px; margin-bottom:8px; }
+    .guide summary{
+        cursor:pointer; list-style:none; padding:14px 16px; font-weight:600; font-size:14.5px;
+        display:flex; align-items:center; gap:12px;
+    }
+    .guide summary::-webkit-details-marker{ display:none; }
+    .guide summary::after{ content:'+'; margin-left:auto; color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:18px; }
+    .guide details[open] summary::after{ content:'−'; }
+    .guide details[open]{ border-color:rgba(232,147,74,.35); }
+    .num{
+        flex:0 0 auto; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+        font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:var(--amber);
+        border:1px solid rgba(232,147,74,.4); background:rgba(232,147,74,.1);
+    }
+    .guide .body{ padding:0 18px 16px 54px; color:var(--text-muted); font-size:13.5px; line-height:1.65; }
+    .guide .body p{ margin:0 0 8px; }
+    .guide .body ol, .guide .body ul{ margin:0 0 8px; padding-left:20px; }
+    .guide .body li{ margin-bottom:4px; }
+    .guide .body b{ color:var(--text); font-weight:600; }
+    .guide .body code{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--amber); background:rgba(232,147,74,.08); padding:1px 6px; border-radius:6px; }
+    .guide .note{
+        margin-top:8px; padding:9px 12px; border-radius:8px; font-size:12.5px;
+        background:rgba(79,168,160,.08); border:1px solid rgba(79,168,160,.3); color:var(--teal);
+    }
+    @media (max-width:480px){ .guide .body{ padding-left:18px; } }
+
     .mini{
         position:fixed; left:0; right:0; bottom:0; z-index:5; display:none;
         padding:12px calc(16px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
@@ -336,7 +371,7 @@ function render_home(): void
 <div class="wrap">
     <div class="eyebrow">DMusicPlayer</div>
     <h1>Thư viện nhạc</h1>
-    <p class="lead">Chọn bài để nghe, xem thông tin tệp hoặc phát nhạc đã lưu offline.</p>
+    <p class="lead">Chọn bài để nghe, xem thông tin tệp hoặc phát nhạc đã lưu offline. <a class="lead-link" href="#guide">Xem hướng dẫn sử dụng ↓</a></p>
 
     <div class="panel">
         <div class="row">
@@ -353,6 +388,97 @@ function render_home(): void
         <input id="search" class="field" type="search" placeholder="Tìm theo tên bài hoặc thư mục..." style="width:100%; margin-bottom:12px;">
         <ul id="list" class="list"></ul>
     </div>
+
+    <section class="guide" id="guide">
+        <div class="guide-head">
+            <h2>Hướng dẫn sử dụng</h2>
+            <button type="button" class="ghost" id="guideToggleAll">Mở tất cả</button>
+        </div>
+
+        <details open>
+            <summary><span class="num">1</span>Thêm nhạc vào thư viện</summary>
+            <div class="body">
+                <ol>
+                    <li>Chép các tệp nhạc vào <b>cùng thư mục với <code>DMusicPlayer.php</code></b> (có thể để trong thư mục con, ví dụ <code>album/bai-hat.mp3</code>).</li>
+                    <li>Nếu nhạc nằm ở nơi khác, mở <code>DMusicPlayer.php</code> và sửa dòng <code>define('MEDIA_DIR', __DIR__);</code> sang đường dẫn thư mục nhạc của bạn.</li>
+                    <li>Tải lại trang, danh sách ở tab <b>Thư viện</b> sẽ tự cập nhật.</li>
+                </ol>
+                <p>Định dạng hỗ trợ: <code>mp3</code> <code>m4a</code> <code>flac</code> <code>wav</code> <code>ogg</code> <code>oga</code> <code>opus</code> <code>wma</code> <code>aac</code>.</p>
+                <div class="note">Trang chủ quét tối đa 6 cấp thư mục và 2000 bài, bỏ qua tệp/thư mục có tên bắt đầu bằng dấu chấm (ví dụ <code>.cache</code>). Trình duyệt có phát được hay không còn tùy định dạng (ví dụ <code>wma</code> thường không phát được trên nhiều trình duyệt).</div>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">2</span>Nghe nhạc và tìm bài</summary>
+            <div class="body">
+                <ul>
+                    <li>Bấm nút <b>▶</b> bên trái mỗi bài để phát ngay. Trình phát nhỏ sẽ hiện cố định ở cuối màn hình, có đủ nút phát/tạm dừng, tua và âm lượng.</li>
+                    <li>Khi một bài kết thúc, app tự phát <b>bài kế tiếp trong danh sách đang hiển thị</b>. Nếu bạn đang lọc bằng ô tìm kiếm, chỉ các bài khớp mới nằm trong hàng đợi.</li>
+                    <li>Gõ vào ô <b>Tìm theo tên bài hoặc thư mục</b> để lọc danh sách; tìm không phân biệt hoa thường.</li>
+                    <li>Bài đang phát được tô viền màu cam trong danh sách.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">3</span>Xem chi tiết bài hát</summary>
+            <div class="body">
+                <p>Bấm vào <b>tên bài</b> để mở trang chi tiết, gồm ảnh bìa, tiêu đề, nghệ sĩ, album, năm phát hành, tốc độ bit, tần số lấy mẫu, định dạng, thời lượng, kích thước và thời gian sửa đổi.</p>
+                <p>Dùng nút <b>← Trang chủ</b> ở đầu trang chi tiết để quay lại.</p>
+                <div class="note">Thông tin thẻ (ID3), bitrate và ảnh bìa cần máy chủ cài sẵn <code>ffprobe</code> và <code>ffmpeg</code>. Nếu thiếu, trang chi tiết vẫn phát được nhạc nhưng chỉ hiện kích thước và ngày sửa đổi.</div>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">4</span>Nghe nhạc từ URL</summary>
+            <div class="body">
+                <ol>
+                    <li>Dán đường dẫn trực tiếp tới tệp nhạc vào ô đầu trang, ví dụ <code>https://example.com/song.mp3</code>.</li>
+                    <li>Bấm <b>Nghe từ URL</b> (hoặc nhấn Enter). App sẽ mở trang phát của bài đó.</li>
+                </ol>
+                <div class="note">URL phải bắt đầu bằng <code>http://</code> hoặc <code>https://</code> và kết thúc bằng một định dạng được hỗ trợ. Máy chủ sẽ tải toàn bộ tệp về rồi phát lại cho bạn nên bài dài có thể mất vài giây để bắt đầu; với nhạc từ URL, trang chi tiết không đọc được thẻ ID3 và ảnh bìa.</div>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">5</span>Lưu nhạc để nghe offline</summary>
+            <div class="body">
+                <ol>
+                    <li>Mở trang chi tiết của bài muốn lưu (bấm tên bài hoặc dùng Nghe từ URL).</li>
+                    <li>Bấm <b>Tải về offline</b>. Khi nút đổi thành <b>Đã lưu offline</b> là bài đã nằm trong trình duyệt của bạn.</li>
+                    <li>Quay lại trang chủ, mở tab <b>Offline</b> để xem, phát (▶) hoặc <b>Xóa</b> các bài đã lưu. Trong trang chi tiết, nút <b>Offline Music</b> cũng mở danh sách này.</li>
+                </ol>
+                <div class="note">Nhạc được lưu trong bộ nhớ của <b>trình duyệt trên thiết bị này</b>, không đồng bộ giữa các máy và sẽ mất nếu bạn xóa dữ liệu trang web. Bài lớn (như tệp flac/wav) chiếm nhiều dung lượng. Hãy mở trang chủ ít nhất một lần khi còn mạng (và đã cài service worker qua HTTPS): app sẽ lưu bản trang chủ, sau đó dù mất mạng vẫn mở được và phát các bài trong tab Offline. Danh sách ở tab Thư viện lúc đó là bản đã lưu lần cuối.</div>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">6</span>Cài như một ứng dụng (PWA)</summary>
+            <div class="body">
+                <ul>
+                    <li><b>Android / Chrome:</b> menu ⋮ → <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.</li>
+                    <li><b>iPhone / Safari:</b> nút Chia sẻ → <b>Thêm vào Màn hình chính</b>.</li>
+                    <li><b>Máy tính / Chrome, Edge:</b> bấm biểu tượng cài đặt ở thanh địa chỉ.</li>
+                </ul>
+                <p>Sau khi cài, app mở toàn màn hình và vào thẳng trang chủ này.</p>
+                <div class="note">Tính năng cài đặt và lưu cache offline cần trang chạy trên <b>HTTPS</b> (hoặc <code>localhost</code> khi thử trên máy).</div>
+            </div>
+        </details>
+
+        <details>
+            <summary><span class="num">7</span>Gặp sự cố?</summary>
+            <div class="body">
+                <ul>
+                    <li><b>Thư viện trống:</b> kiểm tra nhạc có nằm trong <code>MEDIA_DIR</code> không, và PHP có quyền đọc thư mục đó.</li>
+                    <li><b>"Không tìm thấy tệp" / "Định dạng không được hỗ trợ":</b> kiểm tra tên tệp, đuôi tệp và đường dẫn trong URL.</li>
+                    <li><b>Không có ảnh bìa hoặc thông tin bitrate:</b> máy chủ chưa có <code>ffmpeg</code>/<code>ffprobe</code>, hoặc tệp không nhúng sẵn ảnh bìa.</li>
+                    <li><b>Không lưu được offline:</b> trình duyệt đang ở chế độ ẩn danh hoặc chặn IndexedDB; thử cửa sổ thường.</li>
+                    <li><b>Chrome báo "Không thể cài đặt ứng dụng này":</b> trang phải chạy trên HTTPS, không ở chế độ ẩn danh và app chưa được cài. Sau khi cập nhật file, tải lại trang vài lần (hoặc xóa dữ liệu trang trong Cài đặt trang web) để Chrome nhận manifest và icon mới. Nếu vẫn chưa được, dùng <b>Tạo lối tắt</b> để thêm biểu tượng ra màn hình chính.</li>
+                    <li><b>Danh sách chưa cập nhật sau khi thêm nhạc:</b> tải lại trang (Ctrl+F5 / kéo để làm mới) vì app có service worker.</li>
+                </ul>
+            </div>
+        </details>
+    </section>
 </div>
 
 <div class="mini" id="mini">
@@ -579,6 +705,18 @@ function render_home(): void
     document.getElementById('remoteBtn').addEventListener('click', openRemote);
     document.getElementById('remoteUrl').addEventListener('keydown', (e) => { if (e.key === 'Enter') openRemote(); });
 
+    const guideToggleBtn = document.getElementById('guideToggleAll');
+    const guideItems = document.querySelectorAll('#guide details');
+    guideToggleBtn.addEventListener('click', () => {
+        const openAll = Array.from(guideItems).some((d) => !d.open);
+        guideItems.forEach((d) => { d.open = openAll; });
+        guideToggleBtn.textContent = openAll ? 'Thu gọn tất cả' : 'Mở tất cả';
+    });
+    if (location.hash === '#guide') {
+        guideItems.forEach((d) => { d.open = true; });
+        guideToggleBtn.textContent = 'Thu gọn tất cả';
+    }
+
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('DMusicPlayer.php?serviceworker=1', { scope: './' }).catch(() => {});
     }
@@ -599,11 +737,13 @@ if (isset($_GET['serviceworker'])) {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     echo <<<'JS'
 const CACHE_NAME = 'dmusic-player-audio-v1';
-const APP_SHELL = ['/?serviceworker=1'];
+const SHELL_URL = new URL('DMusicPlayer.php', self.location.href).href;
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.add(new Request(SHELL_URL, { cache: 'reload' })).catch(() => {}))
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -620,6 +760,22 @@ self.addEventListener('fetch', (event) => {
     }
     const url = new URL(req.url);
     if (url.searchParams.get('serviceworker') === '1' || url.pathname.endsWith('.webmanifest')) {
+        return;
+    }
+
+    // Home page: network first, fall back to the cached copy when offline.
+    if (req.mode === 'navigate' && url.origin === self.location.origin
+        && url.href.split('?')[0] === SHELL_URL.split('?')[0]
+        && !url.searchParams.has('file') && !url.searchParams.has('icon')) {
+        event.respondWith(
+            fetch(req).then((res) => {
+                if (res && res.ok) {
+                    const copy = res.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(SHELL_URL, copy)).catch(() => {});
+                }
+                return res;
+            }).catch(() => caches.match(SHELL_URL).then((hit) => hit || Response.error()))
+        );
         return;
     }
 
@@ -651,17 +807,98 @@ JS;
     exit;
 }
 
+/** Render the app icon as a PNG (pure PHP + zlib; no GD needed). */
+function render_icon(int $size): void
+{
+    $allowed = [96, 144, 180, 192, 256, 512];
+    if (!in_array($size, $allowed, true)) {
+        $size = 192;
+    }
+    $bg = [22, 21, 28];
+    $amber = [232, 147, 74];
+    $ss = 2; // samples per axis for smooth edges
+
+    // Amber disc with a dark music note cut out of it (normalised 0..1 coords).
+    $isAmber = static function (float $x, float $y): bool {
+        if (($x - 0.5) ** 2 + ($y - 0.5) ** 2 > 0.38 * 0.38) {
+            return false;
+        }
+        // note head
+        if ((($x - 0.43) / 0.10) ** 2 + (($y - 0.64) / 0.075) ** 2 <= 1.0) {
+            return false;
+        }
+        // stem
+        if ($x >= 0.515 && $x <= 0.55 && $y >= 0.28 && $y <= 0.64) {
+            return false;
+        }
+        // flag
+        if ($x > 0.55 && $x <= 0.63) {
+            $off = ($x - 0.55) * 0.9;
+            if ($y >= 0.28 + $off && $y <= 0.36 + $off) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    $raw = '';
+    for ($py = 0; $py < $size; $py++) {
+        $raw .= "\x00";
+        for ($px = 0; $px < $size; $px++) {
+            $hit = 0;
+            for ($sy = 0; $sy < $ss; $sy++) {
+                for ($sx = 0; $sx < $ss; $sx++) {
+                    if ($isAmber(($px + ($sx + 0.5) / $ss) / $size, ($py + ($sy + 0.5) / $ss) / $size)) {
+                        $hit++;
+                    }
+                }
+            }
+            $k = $hit / ($ss * $ss);
+            $raw .= chr((int) round($bg[0] + ($amber[0] - $bg[0]) * $k))
+                . chr((int) round($bg[1] + ($amber[1] - $bg[1]) * $k))
+                . chr((int) round($bg[2] + ($amber[2] - $bg[2]) * $k))
+                . "\xff";
+        }
+    }
+
+    $chunk = static function (string $type, string $data): string {
+        return pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data));
+    };
+    $png = "\x89PNG\r\n\x1a\n"
+        . $chunk('IHDR', pack('NNCCCCC', $size, $size, 8, 6, 0, 0, 0))
+        . $chunk('IDAT', gzcompress($raw, 9))
+        . $chunk('IEND', '');
+
+    header('Content-Type: image/png');
+    header('Cache-Control: public, max-age=86400');
+    header('Content-Length: ' . strlen($png));
+    echo $png;
+    exit;
+}
+
+if (isset($_GET['icon'])) {
+    render_icon((int) $_GET['icon']);
+}
+
 if (isset($_GET['manifest'])) {
     header('Content-Type: application/manifest+json; charset=utf-8');
     echo json_encode([
         'name' => 'DMusicPlayer Offline',
         'short_name' => 'DMusic',
+        'id' => './DMusicPlayer.php',
         'start_url' => './DMusicPlayer.php',
+        'scope' => './',
+        'lang' => 'vi',
         'display' => 'standalone',
         'background_color' => '#16151c',
         'theme_color' => '#16151c',
         'description' => 'PWA music player for browsing and saving offline tracks.',
-        'icons' => []
+        'icons' => [
+            ['src' => 'DMusicPlayer.php?icon=192', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => 'DMusicPlayer.php?icon=512', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => 'DMusicPlayer.php?icon=192', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+            ['src' => 'DMusicPlayer.php?icon=512', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ]
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     exit;
 }
@@ -852,6 +1089,8 @@ if (isset($_GET['stream'])) {
 <title><?= htmlspecialchars($displayTitle, ENT_QUOTES, 'UTF-8') ?> — Xem trước tệp âm thanh</title>
 <link rel="manifest" href="DMusicPlayer.php?manifest=1">
 <meta name="theme-color" content="#16151c">
+<link rel="apple-touch-icon" href="DMusicPlayer.php?icon=180">
+<link rel="icon" type="image/png" sizes="192x192" href="DMusicPlayer.php?icon=192">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
